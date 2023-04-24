@@ -1,42 +1,63 @@
 #include "sort.h"
 /**
+ * get_max - get the max value of an int array
+ * @array: the array of int
+ * @size: size of the array
+ * Return: The max int in the array
+ */
+int get_max(int *array, int size)
+{
+	int max, i;
+
+	for (max = array[0], i = 1; i < size; i++)
+	{
+		if (array[i] > max)
+			max = array[i];
+	}
+
+	return (max);
+}
+
+/**
  * counting_sort - sorts int array in asce order with Counting sort algorithm
  * @array: the array to be sorted
  * @size: size of the array
  */
 void counting_sort(int *array, size_t size)
 {
-	int max, i;
-	int *count_array, *new_array;
+	int *count, *sorted, max, i;
 
 	if (array == NULL || size < 2)
 		return;
-	max = array[0];
-	for (i = 1; i < (int)size; i++)
-		if (array[i] > max)
-			max = array[i];
-	count_array = malloc(sizeof(int) * (max + 1));
-	if (count_array == NULL)
+
+	sorted = malloc(sizeof(int) * size);
+	if (sorted == NULL)
 		return;
-	for (i = 0; i <= max; i++)
-		count_array[i] = 0;
-	for (i = 0; i < (int)size; i++)
-		count_array[array[i]]++;
-	for (i = 1; i <= max; i++)
-		count_array[i] += count_array[i - 1];
-	new_array = malloc(sizeof(int) * size);
-	if (new_array == NULL)
+	max = get_max(array, size);
+	count = malloc(sizeof(int) * (max + 1));
+	if (count == NULL)
 	{
-		free(count_array);
+		free(sorted);
 		return;
-		}
-	for (i = (int)size - 1; i >= 0; i--)
-	{
-		new_array[count_array[array[i]] - 1] = array[i];
-		count_array[array[i]]--;
-		}
+	}
+
+	for (i = 0; i < (max + 1); i++)
+		count[i] = 0;
 	for (i = 0; i < (int)size; i++)
-		array[i] = new_array[i];
-	free(count_array);
-	free(new_array);
+		count[array[i]] += 1;
+	for (i = 0; i < (max + 1); i++)
+		count[i] += count[i - 1];
+	print_array(count, max + 1);
+
+	for (i = 0; i < (int)size; i++)
+	{
+		sorted[count[array[i]] - 1] = array[i];
+		count[array[i]] -= 1;
+	}
+
+	for (i = 0; i < (int)size; i++)
+		array[i] = sorted[i];
+
+	free(sorted);
+	free(count);
 }
